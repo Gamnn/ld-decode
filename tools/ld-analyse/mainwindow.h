@@ -36,7 +36,7 @@
 
 #include "oscilloscopedialog.h"
 #include "aboutdialog.h"
-#include "vbidialog.h"
+#include "vbieditordialog.h"
 #include "dropoutanalysisdialog.h"
 #include "snranalysisdialog.h"
 #include "capturequalityindexdialog.h"
@@ -109,7 +109,7 @@ private:
     // Dialogues
     OscilloscopeDialog* oscilloscopeDialog;
     AboutDialog* aboutDialog;
-    VbiDialog* vbiDialog;
+    VbiEditorDialog* vbiEditorDialog;
     DropoutAnalysisDialog* dropoutAnalysisDialog;
     SnrAnalysisDialog* snrAnalysisDialog;
     BusyDialog* busyDialog;
@@ -132,6 +132,7 @@ private:
     // Update GUI methods
     void updateGuiLoaded();
     void updateGuiUnloaded();
+    void updateVbi();
 
     // Frame display methods
     void showFrame();

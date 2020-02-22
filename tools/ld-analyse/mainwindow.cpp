@@ -34,7 +34,7 @@ MainWindow::MainWindow(QString inputFilenameParam, QWidget *parent) :
     // Set up dialogues
     oscilloscopeDialog = new OscilloscopeDialog(this);
     aboutDialog = new AboutDialog(this);
-    vbiDialog = new VbiDialog(this);
+    vbiEditorDialog = new VbiEditorDialog(this);
     dropoutAnalysisDialog = new DropoutAnalysisDialog(this);
     snrAnalysisDialog = new SnrAnalysisDialog(this);
     busyDialog = new BusyDialog(this);
@@ -66,7 +66,7 @@ MainWindow::MainWindow(QString inputFilenameParam, QWidget *parent) :
     // Load the window geometry and settings from the configuration
     restoreGeometry(configuration.getMainWindowGeometry());
     scaleFactor = configuration.getMainWindowScaleFactor();
-    vbiDialog->restoreGeometry(configuration.getVbiDialogGeometry());
+    vbiEditorDialog->restoreGeometry(configuration.getVbiEditorDialogGeometry());
     oscilloscopeDialog->restoreGeometry(configuration.getOscilloscopeDialogGeometry());
     dropoutAnalysisDialog->restoreGeometry(configuration.getDropoutAnalysisDialogGeometry());
     snrAnalysisDialog->restoreGeometry(configuration.getSnrAnalysisDialogGeometry());
@@ -94,7 +94,7 @@ MainWindow::~MainWindow()
     // Save the window geometry and settings to the configuration
     configuration.setMainWindowGeometry(saveGeometry());
     configuration.setMainWindowScaleFactor(scaleFactor);
-    configuration.setVbiDialogGeometry(vbiDialog->saveGeometry());
+    configuration.setVbiEditorDialogGeometry(vbiEditorDialog->saveGeometry());
     configuration.setOscilloscopeDialogGeometry(oscilloscopeDialog->saveGeometry());
     configuration.setDropoutAnalysisDialogGeometry(dropoutAnalysisDialog->saveGeometry());
     configuration.setSnrAnalysisDialogGeometry(snrAnalysisDialog->saveGeometry());
@@ -289,8 +289,7 @@ void MainWindow::showFrame()
     }
 
     // Update the VBI dialogue
-    if (vbiDialog->isVisible()) vbiDialog->updateVbi(tbcSource.getFrameVbi(currentFrameNumber),
-                                                     tbcSource.getIsFrameVbiValid(currentFrameNumber)); 
+    if (vbiEditorDialog->isVisible()) updateVbi();
 
     // Add the QImage to the QLabel in the dialogue
     ui->frameViewerLabel->clear();
@@ -373,6 +372,20 @@ void MainWindow::updateOscilloscopeDialogue(qint32 scanLine, qint32 pictureDot)
                                        scanLine, pictureDot, tbcSource.getFrameHeight());
 }
 
+// Update the VBI dialogue
+void MainWindow::updateVbi()
+{
+    // Get the VBI data
+    LdDecodeMetaData::Vbi firstField;
+    LdDecodeMetaData::Vbi secondField;
+
+    firstField = tbcSource.getFrameVbi(currentFrameNumber, true);
+    secondField = tbcSource.getFrameVbi(currentFrameNumber, false);
+
+    // Show the VBI dialogue
+    vbiEditorDialog->updateDialog(firstField, secondField);
+}
+
 // Menu bar signal handlers -------------------------------------------------------------------------------------------
 
 void MainWindow::on_actionExit_triggered()
@@ -428,9 +441,8 @@ void MainWindow::on_actionAbout_ld_analyse_triggered()
 // Show the VBI window
 void MainWindow::on_actionVBI_triggered()
 {
-    // Show the VBI dialogue
-    vbiDialog->updateVbi(tbcSource.getFrameVbi(currentFrameNumber), tbcSource.getIsFrameVbiValid(currentFrameNumber));
-    vbiDialog->show();
+    updateVbi();
+    vbiEditorDialog->show();
 }
 
 // Show the drop out analysis graph

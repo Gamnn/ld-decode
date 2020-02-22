@@ -70,7 +70,7 @@ void Configuration::writeConfiguration(void)
     configuration->beginGroup("windows");
     configuration->setValue("mainWindowGeometry", settings.windows.mainWindowGeometry);
     configuration->setValue("mainWindowScaleFactor", settings.windows.mainWindowScaleFactor);
-    configuration->setValue("vbiDialogGeometry", settings.windows.vbiDialogGeometry);
+    configuration->setValue("vbiEditorDialogGeometry", settings.windows.vbiEditorDialogGeometry);
     configuration->setValue("oscilloscopeDialogGeometry", settings.windows.oscilloscopeDialogGeometry);
     configuration->setValue("dropoutAnalysisDialogGeometry", settings.windows.dropoutAnalysisDialogGeometry);
     configuration->setValue("snrAnalysisDialogGeometry", settings.windows.snrAnalysisDialogGeometry);
@@ -101,7 +101,7 @@ void Configuration::readConfiguration(void)
     configuration->beginGroup("windows");
     settings.windows.mainWindowGeometry = configuration->value("mainWindowGeometry").toByteArray();
     settings.windows.mainWindowScaleFactor = configuration->value("mainWindowScaleFactor").toReal();
-    settings.windows.vbiDialogGeometry = configuration->value("vbiDialogGeometry").toByteArray();
+    settings.windows.vbiEditorDialogGeometry = configuration->value("vbiEditorDialogGeometry").toByteArray();
     settings.windows.oscilloscopeDialogGeometry = configuration->value("oscilloscopeDialogGeometry").toByteArray();
     settings.windows.dropoutAnalysisDialogGeometry = configuration->value("dropoutAnalysisDialogGeometry").toByteArray();
     settings.windows.snrAnalysisDialogGeometry = configuration->value("snrAnalysisDialogGeometry").toByteArray();
@@ -123,7 +123,7 @@ void Configuration::setDefault(void)
     // Windows
     settings.windows.mainWindowGeometry = QByteArray();
     settings.windows.mainWindowScaleFactor = 1.0;
-    settings.windows.vbiDialogGeometry = QByteArray();
+    settings.windows.vbiEditorDialogGeometry = QByteArray();
     settings.windows.oscilloscopeDialogGeometry = QByteArray();
     settings.windows.dropoutAnalysisDialogGeometry = QByteArray();
     settings.windows.snrAnalysisDialogGeometry = QByteArray();
@@ -179,14 +179,14 @@ qreal Configuration::getMainWindowScaleFactor(void)
     return settings.windows.mainWindowScaleFactor;
 }
 
-void Configuration::setVbiDialogGeometry(QByteArray vbiDialogGeometry)
+void Configuration::setVbiEditorDialogGeometry(QByteArray vbiEditorDialogGeometry)
 {
-    settings.windows.vbiDialogGeometry = vbiDialogGeometry;
+    settings.windows.vbiEditorDialogGeometry = vbiEditorDialogGeometry;
 }
 
-QByteArray Configuration::getVbiDialogGeometry(void)
+QByteArray Configuration::getVbiEditorDialogGeometry(void)
 {
-    return settings.windows.vbiDialogGeometry;
+    return settings.windows.vbiEditorDialogGeometry;
 }
 
 void Configuration::setOscilloscopeDialogGeometry(QByteArray oscilloscopeDialogGeometry)

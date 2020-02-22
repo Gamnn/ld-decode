@@ -384,16 +384,13 @@ TbcSource::ScanLineData TbcSource::getScanLineData(qint32 frameNumber, qint32 sc
 }
 
 // Method to return the decoded VBI data for a frame
-VbiDecoder::Vbi TbcSource::getFrameVbi(qint32 frameNumber)
+LdDecodeMetaData::Vbi TbcSource::getFrameVbi(qint32 frameNumber, bool firstField)
 {
-    if (!sourceReady) return VbiDecoder::Vbi();
+    if (!sourceReady) LdDecodeMetaData::Vbi();
 
     // Get the field VBI data
-    LdDecodeMetaData::Vbi firstField = ldDecodeMetaData.getFieldVbi(ldDecodeMetaData.getFirstFieldNumber(frameNumber));
-    LdDecodeMetaData::Vbi secondField = ldDecodeMetaData.getFieldVbi(ldDecodeMetaData.getSecondFieldNumber(frameNumber));
-
-    return vbiDecoder.decodeFrame(firstField.vbiData[0], firstField.vbiData[1], firstField.vbiData[2],
-            secondField.vbiData[0], secondField.vbiData[1], secondField.vbiData[2]);
+    if (firstField) return ldDecodeMetaData.getFieldVbi(ldDecodeMetaData.getFirstFieldNumber(frameNumber));
+    return ldDecodeMetaData.getFieldVbi(ldDecodeMetaData.getSecondFieldNumber(frameNumber));
 }
 
 // Method returns true if the VBI is valid for the specified frame number
@@ -820,7 +817,17 @@ void TbcSource::startBackgroundLoad(QString sourceFilename)
     qint32 giveUpCounter = 0;
     chapterMap.clear();
     for (qint32 i = 1; i <= getNumberOfFrames(); i++) {
-        qint32 currentChapter = getFrameVbi(i).chNo;
+        // Get the VBI data
+        LdDecodeMetaData::Vbi firstField;
+        LdDecodeMetaData::Vbi secondField;
+
+        firstField = getFrameVbi(i, true);
+        secondField = getFrameVbi(i, false);
+
+        // Extract the chapter number
+        qint32 currentChapter = vbiDecoder.decodeFrame(firstField.vbiData[0], firstField.vbiData[1], firstField.vbiData[2],
+                secondField.vbiData[0], secondField.vbiData[1], secondField.vbiData[2]).chNo;
+
         if (currentChapter != -1) {
             if (currentChapter != lastChapter) {
                 lastChapter = currentChapter;

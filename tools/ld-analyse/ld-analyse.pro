@@ -52,7 +52,8 @@ SOURCES += \
     ../library/tbc/sourcevideo.cpp \
     ../library/tbc/vbidecoder.cpp \
     ../library/tbc/filters.cpp \
-    ../library/tbc/logging.cpp
+    ../library/tbc/logging.cpp \
+    vbieditordialog.cpp
 
 HEADERS += \
     busydialog.h \
@@ -84,7 +85,8 @@ HEADERS += \
     ../library/tbc/sourcevideo.h \
     ../library/tbc/vbidecoder.h \
     ../library/tbc/filters.h \
-    ../library/tbc/logging.h
+    ../library/tbc/logging.h \
+    vbieditordialog.h
 
 FORMS += \
     busydialog.ui \
@@ -96,7 +98,8 @@ FORMS += \
     palchromadecoderconfigdialog.ui \
     snranalysisdialog.ui \
     vbidialog.ui \
-    dropoutanalysisdialog.ui
+    dropoutanalysisdialog.ui \
+    vbieditordialog.ui
 
 # Add external includes to the include path
 INCLUDEPATH += ../library/filter

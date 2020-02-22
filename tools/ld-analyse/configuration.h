@@ -54,8 +54,8 @@ public:
     QByteArray getMainWindowGeometry(void);
     void setMainWindowScaleFactor(qreal mainWindowScaleFactor);
     qreal getMainWindowScaleFactor(void);
-    void setVbiDialogGeometry(QByteArray vbiDialogGeometry);
-    QByteArray getVbiDialogGeometry(void);
+    void setVbiEditorDialogGeometry(QByteArray vbiEditorDialogGeometry);
+    QByteArray getVbiEditorDialogGeometry(void);
     void setOscilloscopeDialogGeometry(QByteArray oscilloscopeDialogGeometry);
     QByteArray getOscilloscopeDialogGeometry(void);
     void setDropoutAnalysisDialogGeometry(QByteArray videoMetadataDialogGeometry);
@@ -86,7 +86,7 @@ private:
     struct Windows {
         QByteArray mainWindowGeometry;
         qreal mainWindowScaleFactor;
-        QByteArray vbiDialogGeometry;
+        QByteArray vbiEditorDialogGeometry;
         QByteArray oscilloscopeDialogGeometry;
         QByteArray dropoutAnalysisDialogGeometry;
         QByteArray snrAnalysisDialogGeometry;

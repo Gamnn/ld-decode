@@ -81,7 +81,7 @@ public:
     qint32 getFrameHeight();
     qint32 getFrameWidth();
 
-    VbiDecoder::Vbi getFrameVbi(qint32 frameNumber);
+    LdDecodeMetaData::Vbi getFrameVbi(qint32 frameNumber, bool firstField);
     bool getIsFrameVbiValid(qint32 frameNumber);
 
     QVector<qreal> getBlackSnrGraphData();

@@ -308,7 +308,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Type:</string>
+           <string>Frame type:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -948,7 +948,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Copy:</string>
+               <string>Copy allowed:</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

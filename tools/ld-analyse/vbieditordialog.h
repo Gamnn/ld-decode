@@ -49,6 +49,7 @@ private:
 
     VbiDecoder vbiDecoder;
     void editable(bool state);
+    void initialise();
 };
 
 #endif // VBIEDITORDIALOG_H

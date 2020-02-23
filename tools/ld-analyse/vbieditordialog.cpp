@@ -56,9 +56,27 @@ void VbiEditorDialog::updateDialog(LdDecodeMetaData::Vbi firstField, LdDecodeMet
     VbiDecoder::Vbi vbi = vbiDecoder.decodeFrame(firstField.vbiData[0], firstField.vbiData[1], firstField.vbiData[2],
             secondField.vbiData[0], secondField.vbiData[1], secondField.vbiData[2]);
 
-    // Update frame number and chapter
-    ui->frameInfo_frameNumber_spinBox->setValue(vbi.picNo);
-    ui->frameInfo_chapter_spinBox->setValue(vbi.chNo);
+    // Update frame number, timecode and chapter
+    if (vbi.picNo != -1) {
+        // Valid CAV frame number
+        ui->frameInfo_frameNumber_spinBox->setValue(vbi.picNo);
+        ui->frameInfo_chapter_spinBox->setValue(vbi.chNo);
+
+        ui->frameInfo_timecode_timeEdit->setTime(QTime(0, 0, 0));
+        ui->frameInfo_clvPicNo_spinBox->setValue(0);
+    } else if (vbi.clvPicNo == -1) {
+        // Early CLV with minute only timecode
+        ui->frameInfo_timecode_timeEdit->setTime(QTime(0, vbi.clvMin, 0));
+        ui->frameInfo_clvPicNo_spinBox->setValue(0);
+    } else if (vbi.clvMin == -1) {
+        // No timecode or frame number
+        ui->frameInfo_timecode_timeEdit->setTime(QTime(0, 0, 0));
+        ui->frameInfo_clvPicNo_spinBox->setValue(0);
+    } else {
+        // CAV timecode (full)
+        ui->frameInfo_timecode_timeEdit->setTime(QTime(vbi.clvHr, vbi.clvMin, vbi.clvSec));
+        ui->frameInfo_clvPicNo_spinBox->setValue(vbi.clvPicNo);
+    }
 
     // Update the frame type (lead-in, lead-out or visible)
     // and the usercode
@@ -103,10 +121,19 @@ void VbiEditorDialog::updateDialog(LdDecodeMetaData::Vbi firstField, LdDecodeMet
     // Update the disc type
     if (vbi.type == VbiDecoder::VbiDiscTypes::unknownDiscType) {
         ui->frameInfo_discType_comboBox->setCurrentIndex(ui->frameInfo_discType_comboBox->findData(0));
+        ui->frameInfo_frameNumber_spinBox->setEnabled(false);
+        ui->frameInfo_timecode_timeEdit->setEnabled(false);
+        ui->frameInfo_clvPicNo_spinBox->setEnabled(false);
     } else if (vbi.type == VbiDecoder::VbiDiscTypes::cav) {
         ui->frameInfo_discType_comboBox->setCurrentIndex(ui->frameInfo_discType_comboBox->findData(1));
+        ui->frameInfo_frameNumber_spinBox->setEnabled(true);
+        ui->frameInfo_timecode_timeEdit->setEnabled(false);
+        ui->frameInfo_clvPicNo_spinBox->setEnabled(false);
     } else {
         ui->frameInfo_discType_comboBox->setCurrentIndex(ui->frameInfo_discType_comboBox->findData(2));
+        ui->frameInfo_frameNumber_spinBox->setEnabled(false);
+        ui->frameInfo_timecode_timeEdit->setEnabled(true);
+        ui->frameInfo_clvPicNo_spinBox->setEnabled(true);
     }
 
     // Stop code
@@ -173,9 +200,9 @@ void VbiEditorDialog::updateDialog(LdDecodeMetaData::Vbi firstField, LdDecodeMet
 
     // Parity (original only)
     if (vbi.parity) {
-        ui->original_parity_comboBox->setCurrentIndex(ui->original_parity_comboBox->findData(1));
+        ui->original_parity_label->setText("Valid");
     } else {
-        ui->original_parity_comboBox->setCurrentIndex(ui->original_parity_comboBox->findData(0));
+        ui->original_parity_label->setText("Invalid");
     }
 
     // Copy allowed (amendment2 only)
@@ -310,7 +337,8 @@ void VbiEditorDialog::editable(bool state)
     // Frame info
     ui->frameInfo_discType_comboBox->setEnabled(state);
     ui->frameInfo_frameNumber_spinBox->setEnabled(state);
-    ui->frameInfo_timeCode_timeEdit->setEnabled(state);
+    ui->frameInfo_timecode_timeEdit->setEnabled(state);
+    ui->frameInfo_clvPicNo_spinBox->setEnabled(state);
     ui->frameInfo_chapter_spinBox->setEnabled(state);
     ui->frameInfo_type_comboBox->setEditable(state);
     ui->frameInfo_userCode_lineEdit->setEnabled(state);
@@ -325,7 +353,6 @@ void VbiEditorDialog::editable(bool state)
     ui->original_fmFm_comboBox->setEnabled(state);
     ui->original_digital_comboBox->setEnabled(state);
     ui->original_soundMode_comboBox->setEnabled(state);
-    ui->original_parity_comboBox->setEnabled(state);
 
     // Programme status - Amendment 2
     ui->amendment2_cx_comboBox->setEnabled(state);
@@ -383,8 +410,7 @@ void VbiEditorDialog::initialise()
     ui->original_soundMode_comboBox->addItem("bilingual_dump", 10);
     ui->original_soundMode_comboBox->addItem("futureUse", 11);
 
-    ui->original_parity_comboBox->addItem("Valid", 1);
-    ui->original_parity_comboBox->addItem("Invalid", 0);
+    ui->original_parity_label->setText("Unknown");
 
     ui->amendment2_cx_comboBox->addItem("True", 1);
     ui->amendment2_cx_comboBox->addItem("False", 0);
@@ -401,15 +427,8 @@ void VbiEditorDialog::initialise()
 
     ui->amendment2_soundMode_comboBox->addItem("stereo", 0);
     ui->amendment2_soundMode_comboBox->addItem("mono", 1);
-    ui->amendment2_soundMode_comboBox->addItem("audioSubCarriersOff", 2);
     ui->amendment2_soundMode_comboBox->addItem("bilingual", 3);
-    ui->amendment2_soundMode_comboBox->addItem("stereo_stereo", 4);
-    ui->amendment2_soundMode_comboBox->addItem("stereo_bilingual", 5);
-    ui->amendment2_soundMode_comboBox->addItem("crossChannelStereo", 6);
-    ui->amendment2_soundMode_comboBox->addItem("bilingual_bilingual", 7);
     ui->amendment2_soundMode_comboBox->addItem("mono_dump", 8);
-    ui->amendment2_soundMode_comboBox->addItem("stereo_dump", 9);
-    ui->amendment2_soundMode_comboBox->addItem("bilingual_dump", 10);
     ui->amendment2_soundMode_comboBox->addItem("futureUse", 11);
 
     // Set up the spinboxes

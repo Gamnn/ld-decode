@@ -240,11 +240,21 @@
          </widget>
         </item>
         <item>
-         <widget class="QTimeEdit" name="frameInfo_timeCode_timeEdit">
+         <widget class="QTimeEdit" name="frameInfo_timecode_timeEdit">
           <property name="displayFormat">
-           <string>HH:mm:ss.hh</string>
+           <string>HH:mm:ss</string>
           </property>
          </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_29">
+          <property name="text">
+           <string>.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="frameInfo_clvPicNo_spinBox"/>
         </item>
         <item>
          <spacer name="horizontalSpacer_4">
@@ -442,7 +452,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="Original">
          <attribute name="title">
@@ -756,7 +766,17 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="original_parity_comboBox"/>
+             <widget class="QLabel" name="original_parity_label">
+              <property name="minimumSize">
+               <size>
+                <width>85</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Invalid</string>
+              </property>
+             </widget>
             </item>
             <item>
              <spacer name="horizontalSpacer_16">

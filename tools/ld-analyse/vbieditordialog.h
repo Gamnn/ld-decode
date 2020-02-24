@@ -48,6 +48,10 @@ private:
     Ui::VbiEditorDialog *ui;
 
     VbiDecoder vbiDecoder;
+    VbiDecoder::Vbi currentFrameVbi;
+    bool vbiModified;
+
+    void updateFields();
     void editable(bool state);
     void initialise();
 };

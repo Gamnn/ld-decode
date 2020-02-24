@@ -35,7 +35,6 @@ SOURCES += \
     palchromadecoderconfigdialog.cpp \
     snranalysisdialog.cpp \
     tbcsource.cpp \
-    vbidialog.cpp \
     configuration.cpp \
     dropoutanalysisdialog.cpp \
     ../ld-chroma-decoder/palcolour.cpp \
@@ -65,7 +64,6 @@ HEADERS += \
     palchromadecoderconfigdialog.h \
     snranalysisdialog.h \
     tbcsource.h \
-    vbidialog.h \
     configuration.h \
     dropoutanalysisdialog.h \
     ../ld-chroma-decoder/palcolour.h \

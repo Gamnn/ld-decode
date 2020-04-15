@@ -42,18 +42,50 @@ public:
     explicit VbiEditorDialog(QWidget *parent = nullptr);
     ~VbiEditorDialog();
 
-    void updateDialog(LdDecodeMetaData::Vbi firstField, LdDecodeMetaData::Vbi secondField);
+    void updateDialog(LdDecodeMetaData::Vbi _firstField, LdDecodeMetaData::Vbi _secondField, bool _isSourcePal);
+
+private slots:
+    void on_frameInfo_discType_comboBox_currentIndexChanged(int);
+    void on_frameInfo_frameNumber_spinBox_valueChanged(int);
+    void on_frameInfo_timecode_timeEdit_userTimeChanged(const QTime &);
+    void on_frameInfo_clvPicNo_spinBox_valueChanged(int);
+    void on_frameInfo_chapter_spinBox_valueChanged(int);
+    void on_frameInfo_type_comboBox_currentIndexChanged(int);
+    void on_frameInfo_userCode_lineEdit_editingFinished();
+    void on_frameInfo_stopCode_comboBox_currentIndexChanged(int);
+    void on_original_cx_comboBox_currentIndexChanged(int);
+    void on_original_discSize_comboBox_currentIndexChanged(int);
+    void on_original_discSide_comboBox_currentIndexChanged(int);
+    void on_original_teletext_comboBox_currentIndexChanged(int);
+    void on_original_progDump_comboBox_currentIndexChanged(int);
+    void on_original_fmFm_comboBox_currentIndexChanged(int);
+    void on_original_digital_comboBox_currentIndexChanged(int);
+    void on_original_soundMode_comboBox_currentIndexChanged(int);
+    void on_amendment2_cx_comboBox_currentIndexChanged(int);
+    void on_amendment2_discSize_comboBox_currentIndexChanged(int);
+    void on_amendment2_discSide_comboBox_currentIndexChanged(int);
+    void on_amendment2_teletext_comboBox_currentIndexChanged(int);
+    void on_amendment2_copy_comboBox_currentIndexChanged(int);
+    void on_amendment2_stdVideo_comboBox_currentIndexChanged(int);
+    void on_amendment2_soundMode_comboBox_currentIndexChanged(int);
+    void on_reset_pushButton_clicked();
+    void on_apply_pushButton_clicked();
 
 private:
     Ui::VbiEditorDialog *ui;
 
     VbiDecoder vbiDecoder;
     VbiDecoder::Vbi currentFrameVbi;
+    LdDecodeMetaData::Vbi firstField;
+    LdDecodeMetaData::Vbi secondField;
+    bool isSourcePal;
     bool vbiModified;
 
     void updateFields();
     void editable(bool state);
     void initialise();
+    void enableProgrammeStatus(bool state);
+    void convertDialogueToVbi();
 };
 
 #endif // VBIEDITORDIALOG_H

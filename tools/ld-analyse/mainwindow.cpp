@@ -383,7 +383,7 @@ void MainWindow::updateVbi()
     secondField = tbcSource.getFrameVbi(currentFrameNumber, false);
 
     // Show the VBI dialogue
-    vbiEditorDialog->updateDialog(firstField, secondField);
+    vbiEditorDialog->updateDialog(firstField, secondField, tbcSource.getIsSourcePal());
 }
 
 // Menu bar signal handlers -------------------------------------------------------------------------------------------

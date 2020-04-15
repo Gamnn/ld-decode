@@ -41,23 +41,20 @@ VbiEditorDialog::~VbiEditorDialog()
 }
 
 // Update the dialogue based on the VBI data
-void VbiEditorDialog::updateDialog(LdDecodeMetaData::Vbi firstField, LdDecodeMetaData::Vbi secondField)
+void VbiEditorDialog::updateDialog(LdDecodeMetaData::Vbi _firstField, LdDecodeMetaData::Vbi _secondField, bool _isSourcePal)
 {
     // Display the raw VBI data
-    ui->vbidata_firstField_data1_lineEdit->setText(QString("0x%1").arg(firstField.vbiData[0], 6, 16, QLatin1Char('0')));
-    ui->vbidata_firstField_data2_lineEdit->setText(QString("0x%1").arg(firstField.vbiData[1], 6, 16, QLatin1Char('0')));
-    ui->vbidata_firstField_data3_lineEdit->setText(QString("0x%1").arg(firstField.vbiData[2], 6, 16, QLatin1Char('0')));
+    ui->vbidata_firstField_data1_lineEdit->setText(QString("0x%1").arg(_firstField.vbiData[0], 6, 16, QLatin1Char('0')));
+    ui->vbidata_firstField_data2_lineEdit->setText(QString("0x%1").arg(_firstField.vbiData[1], 6, 16, QLatin1Char('0')));
+    ui->vbidata_firstField_data3_lineEdit->setText(QString("0x%1").arg(_firstField.vbiData[2], 6, 16, QLatin1Char('0')));
 
-    ui->vbidata_secondField_data1_lineEdit->setText(QString("0x%1").arg(secondField.vbiData[0], 6, 16, QLatin1Char('0')));
-    ui->vbidata_secondField_data2_lineEdit->setText(QString("0x%1").arg(secondField.vbiData[1], 6, 16, QLatin1Char('0')));
-    ui->vbidata_secondField_data3_lineEdit->setText(QString("0x%1").arg(secondField.vbiData[2], 6, 16, QLatin1Char('0')));
+    ui->vbidata_secondField_data1_lineEdit->setText(QString("0x%1").arg(_secondField.vbiData[0], 6, 16, QLatin1Char('0')));
+    ui->vbidata_secondField_data2_lineEdit->setText(QString("0x%1").arg(_secondField.vbiData[1], 6, 16, QLatin1Char('0')));
+    ui->vbidata_secondField_data3_lineEdit->setText(QString("0x%1").arg(_secondField.vbiData[2], 6, 16, QLatin1Char('0')));
 
     // Decode the VBI data for the frame
-    currentFrameVbi = vbiDecoder.decodeFrame(firstField.vbiData[0], firstField.vbiData[1], firstField.vbiData[2],
-            secondField.vbiData[0], secondField.vbiData[1], secondField.vbiData[2]);
-
-    // Update the fields
-    updateFields();
+    currentFrameVbi = vbiDecoder.decodeFrame(_firstField.vbiData[0], _firstField.vbiData[1], _firstField.vbiData[2],
+            _secondField.vbiData[0], _secondField.vbiData[1], _secondField.vbiData[2]);
 
     // Disable the reset and apply buttons
     ui->apply_pushButton->setEnabled(false);
@@ -65,7 +62,19 @@ void VbiEditorDialog::updateDialog(LdDecodeMetaData::Vbi firstField, LdDecodeMet
 
     // Set the modified flag
     vbiModified = false;
+
+    // Set the source type flag
+    isSourcePal = _isSourcePal;
+
+    // Store the current VBI data
+    firstField = _firstField;
+    secondField = _secondField;
+
+    // Update the fields
+    updateFields();
 }
+
+// Private methods ----------------------------------------------------------------------------------------------------
 
 void VbiEditorDialog::updateFields()
 {
@@ -110,11 +119,8 @@ void VbiEditorDialog::updateFields()
         ui->frameInfo_userCode_lineEdit->setEnabled(true);
         ui->frameInfo_userCode_lineEdit->setText(currentFrameVbi.userCode);
 
-        // Disc size and side is not valid for lead-in
-        ui->original_discSide_comboBox->setEnabled(false);
-        ui->original_discSize_comboBox->setEnabled(false);
-        ui->amendment2_discSide_comboBox->setEnabled(false);
-        ui->amendment2_discSize_comboBox->setEnabled(false);
+        // Programme status is not valid
+        enableProgrammeStatus(false);
 
         // Frame number and timecode not valid for lead-in
         ui->frameInfo_frameNumber_spinBox->setEnabled(false);
@@ -127,11 +133,8 @@ void VbiEditorDialog::updateFields()
         ui->frameInfo_userCode_lineEdit->setEnabled(true);
         ui->frameInfo_userCode_lineEdit->setText(currentFrameVbi.userCode);
 
-        // Disc size and side is not valid for lead-out
-        ui->original_discSide_comboBox->setEnabled(false);
-        ui->original_discSize_comboBox->setEnabled(false);
-        ui->amendment2_discSide_comboBox->setEnabled(false);
-        ui->amendment2_discSize_comboBox->setEnabled(false);
+        // Programme status is not valid
+        enableProgrammeStatus(false);
 
         // Frame number and timecode not valid for lead-in
         ui->frameInfo_frameNumber_spinBox->setEnabled(false);
@@ -144,11 +147,8 @@ void VbiEditorDialog::updateFields()
         ui->frameInfo_userCode_lineEdit->setEnabled(false);
         ui->frameInfo_userCode_lineEdit->setText("");
 
-        // Disc size and side is valid for visible
-        ui->original_discSide_comboBox->setEnabled(true);
-        ui->original_discSize_comboBox->setEnabled(true);
-        ui->amendment2_discSide_comboBox->setEnabled(true);
-        ui->amendment2_discSize_comboBox->setEnabled(true);
+        // Programme status is valid
+        enableProgrammeStatus(true);
     }
 
     // Update the disc type
@@ -355,6 +355,10 @@ void VbiEditorDialog::updateFields()
         ui->amendment2_soundMode_comboBox->setCurrentIndex(ui->amendment2_soundMode_comboBox->findData(11));
         break;
     }
+
+    // Restrict the CLV timecode picture number based on the source type
+    if (isSourcePal) ui->frameInfo_clvPicNo_spinBox->setMaximum(24);
+    else ui->frameInfo_clvPicNo_spinBox->setMaximum(29);
 }
 
 // Make the dialogue editable
@@ -477,11 +481,162 @@ void VbiEditorDialog::initialise()
     ui->original_parity_label->setText("Unknown");
 }
 
+// Method to enable/disable programme status editing
+void VbiEditorDialog::enableProgrammeStatus(bool state)
+{
+    // Original
+    ui->original_cx_comboBox->setEnabled(state);
+    ui->original_discSide_comboBox->setEnabled(state);
+    ui->original_discSize_comboBox->setEnabled(state);
+    ui->original_teletext_comboBox->setEnabled(state);
+    ui->original_progDump_comboBox->setEnabled(state);
+    ui->original_fmFm_comboBox->setEnabled(state);
+    ui->original_digital_comboBox->setEnabled(state);
+    ui->original_soundMode_comboBox->setEnabled(state);
 
+    // Amendment 2
+    ui->amendment2_cx_comboBox->setEnabled(state);
+    ui->amendment2_discSide_comboBox->setEnabled(state);
+    ui->amendment2_discSize_comboBox->setEnabled(state);
+    ui->amendment2_teletext_comboBox->setEnabled(state);
+    ui->amendment2_copy_comboBox->setEnabled(state);
+    ui->amendment2_stdVideo_comboBox->setEnabled(state);
+    ui->amendment2_soundMode_comboBox->setEnabled(state);
+}
 
+// Method to convert the current dialogue to VBI data values
+void VbiEditorDialog::convertDialogueToVbi()
+{
 
+}
 
+// Dialogue actions ---------------------------------------------------------------------------------------------------
 
+void VbiEditorDialog::on_frameInfo_discType_comboBox_currentIndexChanged(int)
+{
+    // Prevent other updates from signalling
+    this->blockSignals(true);
 
+    // Enable signalling
+    this->blockSignals(false);
+}
 
+void VbiEditorDialog::on_frameInfo_frameNumber_spinBox_valueChanged(int)
+{
 
+}
+
+void VbiEditorDialog::on_frameInfo_timecode_timeEdit_userTimeChanged(const QTime&)
+{
+
+}
+
+void VbiEditorDialog::on_frameInfo_clvPicNo_spinBox_valueChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_frameInfo_chapter_spinBox_valueChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_frameInfo_type_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_frameInfo_userCode_lineEdit_editingFinished()
+{
+
+}
+
+void VbiEditorDialog::on_frameInfo_stopCode_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_original_cx_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_original_discSize_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_original_discSide_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_original_teletext_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_original_progDump_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_original_fmFm_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_original_digital_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_original_soundMode_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_amendment2_cx_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_amendment2_discSize_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_amendment2_discSide_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_amendment2_teletext_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_amendment2_copy_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_amendment2_stdVideo_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_amendment2_soundMode_comboBox_currentIndexChanged(int)
+{
+
+}
+
+void VbiEditorDialog::on_reset_pushButton_clicked()
+{
+
+}
+
+void VbiEditorDialog::on_apply_pushButton_clicked()
+{
+
+}

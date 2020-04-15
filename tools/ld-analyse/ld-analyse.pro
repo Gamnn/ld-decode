@@ -95,7 +95,6 @@ FORMS += \
     aboutdialog.ui \
     palchromadecoderconfigdialog.ui \
     snranalysisdialog.ui \
-    vbidialog.ui \
     dropoutanalysisdialog.ui \
     vbieditordialog.ui
 

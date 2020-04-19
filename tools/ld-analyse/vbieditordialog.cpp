@@ -507,128 +507,286 @@ void VbiEditorDialog::enableProgrammeStatus(bool state)
 // Method to convert the current dialogue to VBI data values
 void VbiEditorDialog::convertDialogueToVbi()
 {
+    // Prevent other updates from signalling
+    this->blockSignals(true);
 
+    // Define an encoder object
+    VbiEncoder::Vbi encodeVbi;
+
+    // Set encoder object according to dialogue
+
+    // Frame info - Disc type
+    switch(ui->frameInfo_discType_comboBox->currentIndex()) {
+    case 0: encodeVbi.type = VbiEncoder::VbiDiscTypes::unknownDiscType;
+        break;
+
+    case 1: encodeVbi.type = VbiEncoder::VbiDiscTypes::cav;
+        break;
+
+    case 2: encodeVbi.type = VbiEncoder::VbiDiscTypes::clv;
+        break;
+    default: qDebug() << "Invalid disc type";
+    }
+
+    // Frame info - frame number
+    encodeVbi.picNo = ui->frameInfo_frameNumber_spinBox->value();
+
+    // Frame info - time code
+    encodeVbi.clvHr = ui->frameInfo_timecode_timeEdit->time().hour();
+    encodeVbi.clvMin = ui->frameInfo_timecode_timeEdit->time().minute();
+    encodeVbi.clvSec = ui->frameInfo_timecode_timeEdit->time().second();
+    encodeVbi.picNo = ui->frameInfo_clvPicNo_spinBox->value();
+
+    // Frame info - chapter number
+    encodeVbi.chNo = ui->frameInfo_chapter_spinBox->value();
+
+    // Frame info - frame type
+    switch(ui->frameInfo_type_comboBox->currentIndex()) {
+    case 0: encodeVbi.leadIn = false;
+        encodeVbi.leadOut = false;
+        break;
+
+    case 1: encodeVbi.leadIn = true;
+        encodeVbi.leadOut = false;
+        break;
+
+    case 2: encodeVbi.leadIn = false;
+        encodeVbi.leadOut = true;
+        break;
+    default: qDebug() << "Invalid frame type";
+    }
+
+    // Frame info - User code
+    encodeVbi.userCode = ui->frameInfo_userCode_lineEdit->text();
+
+    // Frame info - Picture stop code
+    switch(ui->frameInfo_stopCode_comboBox->currentIndex())
+    {
+    case 0: encodeVbi.picStop = false;
+        break;
+    case 1: encodeVbi.picStop = true;
+        break;
+    default: qDebug() << "Invalid stop code";
+    }
+
+    // Programme status (original) - CX
+    if (ui->original_cx_comboBox->currentIndex() == 0) encodeVbi.cx = false; else encodeVbi.cx = true;
+
+    // Programme status (original) - disc size
+    if (ui->original_discSize_comboBox->currentIndex() == 0) encodeVbi.size = false; else encodeVbi.size = true;
+
+    // Programme status (original) - disc side
+    if (ui->original_discSide_comboBox->currentIndex() == 0) encodeVbi.side = false; else encodeVbi.side = true;
+
+    // Programme status (original) - teletext
+    if (ui->original_teletext_comboBox->currentIndex() == 0) encodeVbi.teletext = false; else encodeVbi.teletext = true;
+
+    // Programme status (original) - programme dump
+    if (ui->original_progDump_comboBox->currentIndex() == 0) encodeVbi.dump = false; else encodeVbi.dump = true;
+
+    // Programme status (original) - FM-FM
+    if (ui->original_fmFm_comboBox->currentIndex() == 0) encodeVbi.fm = false; else encodeVbi.fm = true;
+
+    // Programme status (original) - Digital
+    if (ui->original_digital_comboBox->currentIndex() == 0) encodeVbi.digital = false; else encodeVbi.digital = true;
+
+    // Programme status (original) - Sound Mode
+    switch(ui->original_soundMode_comboBox->currentIndex()) {
+    case 0: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::stereo;
+        break;
+    case 1: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::mono;
+        break;
+    case 2: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::audioSubCarriersOff;
+        break;
+    case 3: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::bilingual;
+        break;
+    case 4: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::stereo_stereo;
+        break;
+    case 5: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::stereo_bilingual;
+        break;
+    case 6: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::crossChannelStereo;
+        break;
+    case 7: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::bilingual_bilingual;
+        break;
+    case 8: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::mono_dump;
+        break;
+    case 9: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::stereo_dump;
+        break;
+    case 10: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::bilingual_dump;
+        break;
+    case 11: encodeVbi.soundMode = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    default: qDebug() << "Invalid (original) sound mode";
+    }
+
+    // Programme status (amendment 2) - CX
+    if (ui->amendment2_cx_comboBox->currentIndex() == 0) encodeVbi.cx = false; else encodeVbi.cx = true;
+
+    // Programme status (amendment 2) - disc size
+    if (ui->amendment2_discSize_comboBox->currentIndex() == 0) encodeVbi.size = false; else encodeVbi.size = true;
+
+    // Programme status (amendment 2) - disc side
+    if (ui->amendment2_discSide_comboBox->currentIndex() == 0) encodeVbi.side = false; else encodeVbi.side = true;
+
+    // Programme status (amendment 2) - teletext
+    if (ui->amendment2_teletext_comboBox->currentIndex() == 0) encodeVbi.teletext = false; else encodeVbi.teletext = true;
+
+    // Programme status (amendment 2) - copy
+    if (ui->amendment2_copy_comboBox->currentIndex() == 0) encodeVbi.copyAm2 = false; else encodeVbi.copyAm2 = true;
+
+    // Programme status (amendment 2) - Standard video
+    if (ui->amendment2_stdVideo_comboBox->currentIndex() == 0) encodeVbi.standardAm2 = false; else encodeVbi.standardAm2 = true;
+
+    // Programme status (amendment 2) - Sound Mode
+    switch(ui->amendment2_soundMode_comboBox->currentIndex()) {
+    case 0: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::stereo;
+        break;
+    case 1: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::mono;
+        break;
+    case 2: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    case 3: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::bilingual;
+        break;
+    case 4: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    case 5: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    case 6: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    case 7: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    case 8: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::mono_dump;
+        break;
+    case 9: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    case 10: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    case 11: encodeVbi.soundModeAm2 = VbiEncoder::VbiSoundModes::futureUse;
+        break;
+    default: qDebug() << "Invalid (amendment 2) sound mode";
+    }
+
+    vbiEncoder.setVbiData(encodeVbi);
+
+    // Enable signalling
+    this->blockSignals(false);
 }
 
 // Dialogue actions ---------------------------------------------------------------------------------------------------
 
 void VbiEditorDialog::on_frameInfo_discType_comboBox_currentIndexChanged(int)
 {
-    // Prevent other updates from signalling
-    this->blockSignals(true);
-
-    // Enable signalling
-    this->blockSignals(false);
+   convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_frameInfo_frameNumber_spinBox_valueChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_frameInfo_timecode_timeEdit_userTimeChanged(const QTime&)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_frameInfo_clvPicNo_spinBox_valueChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_frameInfo_chapter_spinBox_valueChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_frameInfo_type_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_frameInfo_userCode_lineEdit_editingFinished()
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_frameInfo_stopCode_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_original_cx_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_original_discSize_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_original_discSide_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_original_teletext_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_original_progDump_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_original_fmFm_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_original_digital_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_original_soundMode_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_amendment2_cx_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_amendment2_discSize_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_amendment2_discSide_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_amendment2_teletext_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_amendment2_copy_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_amendment2_stdVideo_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_amendment2_soundMode_comboBox_currentIndexChanged(int)
 {
-
+    convertDialogueToVbi();
 }
 
 void VbiEditorDialog::on_reset_pushButton_clicked()

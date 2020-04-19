@@ -29,6 +29,7 @@
 
 #include "lddecodemetadata.h"
 #include "vbidecoder.h"
+#include "vbiencoder.h"
 
 namespace Ui {
 class VbiEditorDialog;
@@ -76,6 +77,10 @@ private:
 
     VbiDecoder vbiDecoder;
     VbiDecoder::Vbi currentFrameVbi;
+
+    VbiEncoder vbiEncoder;
+    VbiEncoder::Vbi encodeVbi;
+
     LdDecodeMetaData::Vbi firstField;
     LdDecodeMetaData::Vbi secondField;
     bool isSourcePal;

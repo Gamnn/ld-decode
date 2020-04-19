@@ -50,6 +50,7 @@ SOURCES += \
     ../library/tbc/lddecodemetadata.cpp \
     ../library/tbc/sourcevideo.cpp \
     ../library/tbc/vbidecoder.cpp \
+    ../library/tbc/vbiencoder.cpp \
     ../library/tbc/filters.cpp \
     ../library/tbc/logging.cpp \
     vbieditordialog.cpp
@@ -82,6 +83,7 @@ HEADERS += \
     ../library/tbc/lddecodemetadata.h \
     ../library/tbc/sourcevideo.h \
     ../library/tbc/vbidecoder.h \
+    ../library/tbc/vbiencoder.h \
     ../library/tbc/filters.h \
     ../library/tbc/logging.h \
     vbieditordialog.h

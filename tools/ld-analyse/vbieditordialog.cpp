@@ -71,7 +71,9 @@ void VbiEditorDialog::updateDialog(LdDecodeMetaData::Vbi _firstField, LdDecodeMe
     secondField = _secondField;
 
     // Update the fields
+    this->blockSignals(true);
     updateFields();
+    this->blockSignals(false);
 }
 
 // Private methods ----------------------------------------------------------------------------------------------------
@@ -510,9 +512,6 @@ void VbiEditorDialog::convertDialogueToVbi()
     // Prevent other updates from signalling
     this->blockSignals(true);
 
-    // Define an encoder object
-    VbiEncoder::Vbi encodeVbi;
-
     // Set encoder object according to dialogue
 
     // Frame info - Disc type
@@ -666,7 +665,13 @@ void VbiEditorDialog::convertDialogueToVbi()
     default: qDebug() << "Invalid (amendment 2) sound mode";
     }
 
+    // Pass the data to the VBI encoder
     vbiEncoder.setVbiData(encodeVbi);
+
+    // Encode the VBI
+    qint32 tmpVbi16_1, tmpVbi17_1, tmpVbi18_1;
+    qint32 tmpVbi16_2, tmpVbi17_2, tmpVbi18_2;
+    vbiEncoder.getRawVbiData(tmpVbi16_1, tmpVbi17_1, tmpVbi18_1, tmpVbi16_2, tmpVbi17_2, tmpVbi18_2);
 
     // Enable signalling
     this->blockSignals(false);

@@ -51,6 +51,14 @@ VbiEncoder::VbiEncoder()
     vbi.parity = false;
     vbi.copyAm2 = false;
     vbi.standardAm2 = false;
+
+    // Reset the current VBI data
+    vbi16_1 = 0;
+    vbi17_1 = 0;
+    vbi18_1 = 0;
+    vbi16_2 = 0;
+    vbi17_2 = 0;
+    vbi18_2 = 0;
 }
 
 // Get methods
@@ -59,6 +67,14 @@ VbiEncoder::VbiEncoder()
 void VbiEncoder::getRawVbiData(qint32& _vbi16_1, qint32& _vbi17_1, qint32& _vbi18_1,
            qint32& _vbi16_2, qint32& _vbi17_2, qint32& _vbi18_2)
 {
+    // Pass back the result
+    qDebug() << "Encoded vbi (line 1): 16 =" << QString("0x%1").arg(vbi16_1, 6, 16, QLatin1Char('0'))
+             << "17 =" << QString("0x%1").arg(vbi17_1, 6, 16, QLatin1Char('0'))
+             << "18 =" << QString("0x%1").arg(vbi18_1, 6, 16, QLatin1Char('0'));
+    qDebug() << "Encoded vbi (line 2): 16 =" << QString("0x%1").arg(vbi16_2, 6, 16, QLatin1Char('0'))
+             << "17 =" << QString("0x%1").arg(vbi17_2, 6, 16, QLatin1Char('0'))
+             << "18 =" << QString("0x%1").arg(vbi18_2, 6, 16, QLatin1Char('0'));
+
     _vbi16_1 = vbi16_1;
     _vbi17_1 = vbi17_1;
     _vbi18_1 = vbi18_1;
@@ -79,5 +95,16 @@ VbiEncoder::Vbi VbiEncoder::getVbiData()
 // Set the VBI data
 void VbiEncoder::setVbiData(Vbi _vbi)
 {
-    qDebug() << "setVbiData has been called";
+    // Reset the current VBI data
+    vbi16_1 = 0;
+    vbi17_1 = 0;
+    vbi18_1 = 0;
+    vbi16_2 = 0;
+    vbi17_2 = 0;
+    vbi18_2 = 0;
+
+    vbi = _vbi;
+
+    // Encode the VBI data
+    qDebug() << "Encoding the VBI data...";
 }

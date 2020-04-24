@@ -32,7 +32,7 @@ SOURCES += \
     mainwindow.cpp \
     oscilloscopedialog.cpp \
     aboutdialog.cpp \
-    palchromadecoderconfigdialog.cpp \
+    chromadecoderconfigdialog.cpp \
     snranalysisdialog.cpp \
     tbcsource.cpp \
     configuration.cpp \
@@ -62,7 +62,7 @@ HEADERS += \
     mainwindow.h \
     oscilloscopedialog.h \
     aboutdialog.h \
-    palchromadecoderconfigdialog.h \
+    chromadecoderconfigdialog.h \
     snranalysisdialog.h \
     tbcsource.h \
     configuration.h \
@@ -95,7 +95,7 @@ FORMS += \
     mainwindow.ui \
     oscilloscopedialog.ui \
     aboutdialog.ui \
-    palchromadecoderconfigdialog.ui \
+    chromadecoderconfigdialog.ui \
     snranalysisdialog.ui \
     dropoutanalysisdialog.ui \
     vbieditordialog.ui

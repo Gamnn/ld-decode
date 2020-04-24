@@ -107,4 +107,84 @@ void VbiEncoder::setVbiData(Vbi _vbi)
 
     // Encode the VBI data
     qDebug() << "Encoding the VBI data...";
+
+    // IEC 60857-1986 - 10.1.1 Lead-in
+    if (vbi.leadIn) {
+        vbi17_1 = 0x88FFFF;
+        vbi18_1 = 0x88FFFF;
+        vbi17_2 = 0x88FFFF;
+        vbi18_2 = 0x88FFFF;
+    }
+
+    // IEC 60857-1986 - 10.1.2 Lead-out
+    if (vbi.leadOut) {
+        vbi17_1 = 0x80EEEE;
+        vbi18_1 = 0x80EEEE;
+        vbi17_2 = 0x80EEEE;
+        vbi18_2 = 0x80EEEE;
+    }
+
+    // IEC 60857-1986 - 10.1.3 Picture numbers
+    if (!vbi.leadIn && !vbi.leadOut && vbi.type == VbiEncoder::VbiDiscTypes::cav) {
+        // CAV Picture number is a BCD encoded string
+        QString picNoString = QString("F%1").arg(vbi.picNo, 5, 10, QLatin1Char('0'));
+        bool convStatus;
+        vbi17_1 = picNoString.toInt(&convStatus, 16);
+        vbi18_1 = picNoString.toInt(&convStatus, 16);
+        vbi17_2 = picNoString.toInt(&convStatus, 16);
+        vbi18_2 = picNoString.toInt(&convStatus, 16);
+    }
+
+    // IEC 60857-1986 - 10.1.4 Picture stop code
+    // Note: There is a 'legacy' and spec-based way to do this, here we only follow
+    // the specification
+    if (!vbi.leadIn && !vbi.leadOut && vbi.type == VbiEncoder::VbiDiscTypes::cav) {
+        // Stop code is inserted into the second field
+        if (vbi.picStop) {
+            vbi16_2 = 0x82CFFF;
+            vbi17_2 = 0x82CFFF;
+        }
+    }
+
+    // IEC 60857-1986 - 10.1.5 Chapter numbers
+    if (!vbi.leadIn && !vbi.leadOut) {
+        QString chNoString = QString("8%1DDD").arg(vbi.chNo, 2, 10, QLatin1Char('0'));
+        bool convStatus;
+
+        if (vbi.type == VbiEncoder::VbiDiscTypes::cav) {
+            // CAV
+            vbi17_2 = chNoString.toInt(&convStatus, 16);
+            vbi18_2 = chNoString.toInt(&convStatus, 16);
+        } else {
+            // CLV
+            vbi18_1 = chNoString.toInt(&convStatus, 16);
+            vbi18_2 = chNoString.toInt(&convStatus, 16);
+        }
+    }
+
+    // IEC 60857-1986 - 10.1.6 Programme time code
+    if (!vbi.leadIn && !vbi.leadOut && vbi.type == VbiEncoder::VbiDiscTypes::clv) {
+        QString timecodeString = QString("F%1DD%2").arg(vbi.clvHr, 1, 10, QLatin1Char('0')).arg(vbi.clvMin, 2, 10, QLatin1Char('0'));
+        bool convStatus;
+        vbi17_1 = timecodeString.toInt(&convStatus, 16);
+        vbi18_1 = timecodeString.toInt(&convStatus, 16);
+    }
+
+    // IEC 60857-1986 - 10.1.7 Constant linear velocity code
+    if (!vbi.leadIn && !vbi.leadOut && vbi.type == VbiEncoder::VbiDiscTypes::clv) {
+        vbi16_2 = 0x87FFFF;
+    }
+
+    // IEC 60857-1986 - 10.1.8 Programme status code
+    // Note: for CAV the picture stop code has priority
+    // Note: For the original specification and amendment 2 - this has different meaning
+    // TBA
+
+    // IEC 60857-1986 - 10.1.9 Users code
+    if (vbi.leadIn || vbi.leadOut) {
+
+    }
+
+    // IEC 60857-1986 - 10.1.10 CLV picture number
+
 }

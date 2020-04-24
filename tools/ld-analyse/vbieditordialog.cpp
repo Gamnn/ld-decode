@@ -534,7 +534,7 @@ void VbiEditorDialog::convertDialogueToVbi()
     encodeVbi.clvHr = ui->frameInfo_timecode_timeEdit->time().hour();
     encodeVbi.clvMin = ui->frameInfo_timecode_timeEdit->time().minute();
     encodeVbi.clvSec = ui->frameInfo_timecode_timeEdit->time().second();
-    encodeVbi.picNo = ui->frameInfo_clvPicNo_spinBox->value();
+    encodeVbi.clvPicNo = ui->frameInfo_clvPicNo_spinBox->value();
 
     // Frame info - chapter number
     encodeVbi.chNo = ui->frameInfo_chapter_spinBox->value();

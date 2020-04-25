@@ -89,7 +89,7 @@ public:
     Vbi getVbiData();
 
     // Set methods
-    void setVbiData(Vbi _vbi);
+    void setVbiData(Vbi _vbi, bool isSourcePal);
 
 private:
     // Define the two fields of VBI data (3 lines each)

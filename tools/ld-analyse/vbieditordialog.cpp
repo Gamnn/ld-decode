@@ -422,24 +422,24 @@ void VbiEditorDialog::initialise()
     ui->frameInfo_type_comboBox->addItem("Lead-out", 2);
     ui->frameInfo_type_comboBox->setEditable(false);
 
-    ui->frameInfo_stopCode_comboBox->addItem("True", 1);
     ui->frameInfo_stopCode_comboBox->addItem("False", 0);
+    ui->frameInfo_stopCode_comboBox->addItem("True", 1);
     ui->frameInfo_stopCode_comboBox->setEditable(false);
 
-    ui->original_cx_comboBox->addItem("True", 1);
     ui->original_cx_comboBox->addItem("False", 0);
+    ui->original_cx_comboBox->addItem("True", 1);
     ui->original_discSize_comboBox->addItem("12 inch", 0);
     ui->original_discSize_comboBox->addItem("8 inch", 1);
     ui->original_discSide_comboBox->addItem("1", 0);
     ui->original_discSide_comboBox->addItem("2", 1);
-    ui->original_teletext_comboBox->addItem("True", 1);
     ui->original_teletext_comboBox->addItem("False", 0);
-    ui->original_progDump_comboBox->addItem("True", 1);
+    ui->original_teletext_comboBox->addItem("True", 1);
     ui->original_progDump_comboBox->addItem("False", 0);
-    ui->original_fmFm_comboBox->addItem("True", 1);
+    ui->original_progDump_comboBox->addItem("True", 1);
     ui->original_fmFm_comboBox->addItem("False", 0);
-    ui->original_digital_comboBox->addItem("True", 1);
+    ui->original_fmFm_comboBox->addItem("True", 1);
     ui->original_digital_comboBox->addItem("False", 0);
+    ui->original_digital_comboBox->addItem("True", 1);
 
     ui->original_soundMode_comboBox->addItem("stereo", 0);
     ui->original_soundMode_comboBox->addItem("mono", 1);
@@ -454,18 +454,18 @@ void VbiEditorDialog::initialise()
     ui->original_soundMode_comboBox->addItem("bilingual_dump", 10);
     ui->original_soundMode_comboBox->addItem("futureUse", 11);
 
-    ui->amendment2_cx_comboBox->addItem("True", 1);
     ui->amendment2_cx_comboBox->addItem("False", 0);
+    ui->amendment2_cx_comboBox->addItem("True", 1);
     ui->amendment2_discSize_comboBox->addItem("12 inch", 0);
     ui->amendment2_discSize_comboBox->addItem("8 inch", 1);
     ui->amendment2_discSide_comboBox->addItem("1", 0);
     ui->amendment2_discSide_comboBox->addItem("2", 1);
-    ui->amendment2_teletext_comboBox->addItem("True", 1);
     ui->amendment2_teletext_comboBox->addItem("False", 0);
-    ui->amendment2_copy_comboBox->addItem("True", 1);
+    ui->amendment2_teletext_comboBox->addItem("True", 1);
     ui->amendment2_copy_comboBox->addItem("False", 0);
-    ui->amendment2_stdVideo_comboBox->addItem("True", 1);
+    ui->amendment2_copy_comboBox->addItem("True", 1);
     ui->amendment2_stdVideo_comboBox->addItem("False", 0);
+    ui->amendment2_stdVideo_comboBox->addItem("True", 1);
 
     ui->amendment2_soundMode_comboBox->addItem("stereo", 0);
     ui->amendment2_soundMode_comboBox->addItem("mono", 1);
@@ -666,7 +666,7 @@ void VbiEditorDialog::convertDialogueToVbi()
     }
 
     // Pass the data to the VBI encoder
-    vbiEncoder.setVbiData(encodeVbi);
+    vbiEncoder.setVbiData(encodeVbi, isSourcePal);
 
     // Encode the VBI
     qint32 tmpVbi16_1, tmpVbi17_1, tmpVbi18_1;

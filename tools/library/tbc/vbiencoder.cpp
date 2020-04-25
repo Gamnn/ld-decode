@@ -93,7 +93,7 @@ VbiEncoder::Vbi VbiEncoder::getVbiData()
 // Set methods
 
 // Set the VBI data
-void VbiEncoder::setVbiData(Vbi _vbi)
+void VbiEncoder::setVbiData(Vbi _vbi, bool isSourcePal)
 {
     // Reset the current VBI data
     vbi16_1 = 0;
@@ -129,15 +129,22 @@ void VbiEncoder::setVbiData(Vbi _vbi)
         // CAV Picture number is a BCD encoded string
         QString picNoString = QString("F%1").arg(vbi.picNo, 5, 10, QLatin1Char('0'));
         bool convStatus;
-        vbi17_1 = picNoString.toInt(&convStatus, 16);
-        vbi18_1 = picNoString.toInt(&convStatus, 16);
-        vbi17_2 = picNoString.toInt(&convStatus, 16);
-        vbi18_2 = picNoString.toInt(&convStatus, 16);
+        qint32 picNoInt = picNoString.toInt(&convStatus, 16);
+
+        // Use Pre-NTSC IEC specification picture stop encoding?
+        if (!isSourcePal) {
+            if (!vbi.picStop) {
+                picNoInt |= 1UL << 19;
+            }
+        }
+
+        vbi17_1 = picNoInt;
+        vbi18_1 = picNoInt;
+        vbi17_2 = picNoInt;
+        vbi18_2 = picNoInt;
     }
 
     // IEC 60857-1986 - 10.1.4 Picture stop code
-    // Note: There is a 'legacy' and spec-based way to do this, here we only follow
-    // the specification
     if (!vbi.leadIn && !vbi.leadOut && vbi.type == VbiEncoder::VbiDiscTypes::cav) {
         // Stop code is inserted into the second field
         if (vbi.picStop) {
@@ -186,5 +193,7 @@ void VbiEncoder::setVbiData(Vbi _vbi)
     }
 
     // IEC 60857-1986 - 10.1.10 CLV picture number
+    if (!vbi.leadIn && !vbi.leadOut && vbi.type == VbiEncoder::VbiDiscTypes::clv) {
 
+    }
 }
